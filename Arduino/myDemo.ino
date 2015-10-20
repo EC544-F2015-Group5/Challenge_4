@@ -1,62 +1,51 @@
- 
-#include <I2C.h>
-#include <PID_v1.h>
-#define    LIDARLite_ADDRESS   0x62          // Default I2C Address of LIDAR-Lite.
-#define    RegisterMeasure     0x00          // Register to write to initiate ranging.
-#define    MeasureValue        0x04          // Value to initiate ranging.
-#define    RegisterHighLowB    0x8f          // Register to get both High and Low bytes in 1 call.
+/*
+*
+* Autonomous control
+*/
 
-int active_sensor = 0; //0 is left, 1 is right
 
-// define variables we will be connecting
-double Setpoint_left, Input_left, Output_left;
-int Kp = 2;     // initial 2
-int Ki = 0.05;  // initial 0.05
-int Kd = 0.5;   // initial 0.5
-
-PID PIDleft(&Input_left, &Output_left, &Setpoint_left, Kp, Ki, Kd, DIRECT); 
+int irsensor = A5;
+int motorspeed;
+int run = 0;
+int measure = 1;
+int ambientir = 0;
+int distance;
 
 void setup() {
-  Serial.begin(9600); //Opens serial connection at 9600bps.     
-  I2c.begin(); // Opens & joins the irc bus as master
-  delay(100); // Waits to make sure everything is powered up before sending or receiving data  
-  I2c.timeOut(50); // Sets a timeout to ensure no locking up of sketch if I2C communication fails
-
-  //initialize linked variables
-  Setpoint_left = 30; //30
-  PIDleft.SetOutputLimits(-50,50);
-
-  //turn on PID loop
-  PIDleft.SetMode(AUTOMATIC);
+  //Setup Channel A
+  pinMode(12, OUTPUT); //Initiates Motor Channel A pin
+  pinMode(9, OUTPUT); //Initiates Brake Channel A pin
+  pinMode(irsensor, INPUT);
+  digitalWrite(irsensor, HIGH);
+  Serial.begin(9600);
 }
 
-void loop() {
-// Write 0x04 to register 0x00
-  uint8_t nackack_left = 100; // Setup variable to hold ACK/NACK resopnses     
-  while (nackack_left != 0){ // While NACK keep going (i.e. continue polling until sucess message (ACK) is received )
-    nackack_left = I2c.write(LIDARLite_ADDRESS,RegisterMeasure, MeasureValue); // Write 0x04 to 0x00
-    delay(1); // Wait 1 ms to prevent overpolling
+void loop(){
+  if(run == 0)
+  {
+    delay(1000);
+    do{
+      ambientir = ambientir + analogRead(irsensor);
+      delay(1000);
+      measure = measure + 1;
+    }
+    while(measure < 10);
+    ambientir = ambientir / 10;
+    run = run +1;
   }
 
-  byte distanceArray[2]; // array to store distance bytes from read function
-  
-  // Read 2byte distance from register 0x8f
-  nackack_left = 100; // Setup variable to hold ACK/NACK resopnses     
-  while (nackack_left != 0){ // While NACK keep going (i.e. continue polling until sucess message (ACK) is received )
-    nackack_left = I2c.read(LIDARLite_ADDRESS,RegisterHighLowB, 2, distanceArray); // Read 2 Bytes from LIDAR-Lite Address and store in array
-    delay(1); // Wait 1 ms to prevent overpolling
+  distance = analogRead(irsensor);
+
+  if(distance < ambientir - 50){
+    digitalWrite(12, HIGH); //Establishes backward direction of Channel A
+    digitalWrite(9, LOW);   //Disengage the Brake for Channel A
+    analogWrite(3, 100);   //Spins the motor on Channel A at half speed
   }
-  int distance_left = (distanceArray[0] << 8) + distanceArray[1];  // Shift high byte [0] 8 to the left and add low byte [1] to create 16-bit int
-  Input_left = distance_left;
-
-  // use PID loop 
-  PIDleft.Compute();
-  delay(10);
-  
-  // Print Distance
-  Serial.print("Distance: ");
-  Serial.print(distance_left);
-  Serial.print(", PIDleft: ");
-  Serial.println(Output_left);
-
+ 
+  if(distance > ambientir - 50){
+    digitalWrite(12, LOW); //Establishes forward direction of Channel A
+    digitalWrite(9, LOW);   //Disengage the Brake for Channel A
+    analogWrite(3, 100);   //Spins the motor on Channel A at full speed
+  }
+  Serial.println(distance);
 }
