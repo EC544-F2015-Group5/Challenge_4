@@ -74,21 +74,21 @@ void loop() {
     }
     else if (buffer == '2'){
       digitalWrite(LED, HIGH);
-      XBee.println("Backward");
+      XBee.println("Stop");
       esc.write(90); // full backwards
       delay(1000);
       continue;
     }
     else if (buffer == '3'){
       digitalWrite(LED, HIGH);
-      XBee.println("Turn Left");
+      XBee.println("Turn Right");
       esc.write(0); 
       wheels.write(45); // left
       continue;
     }
     else if (buffer == '4'){
       digitalWrite(LED, HIGH);
-      XBee.println("Turn Right");
+      XBee.println("Turn Left");
       wheels.write(135); // right
       continue;
     }
