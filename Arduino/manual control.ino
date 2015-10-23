@@ -13,25 +13,17 @@ double wheelOffset = 0.0; // For Adjusting the wheel
 //double wheelStartUpOffset = 0.0; // For Adjusting the steering
 char buffer;
 //define constants
-#define LED1 4
-//#define LED2 5
-//#define LED3 11
-//#define LED4 13
+#define LED 4
 
 void setup() {
   wheels.attach(8); // initialize wheel servo to Digital IO Pin #8
   esc.attach(9); // initialize ESC to Digital IO Pin #9                
   XBee.begin(9600);
   Serial.begin(9600);
-  pinMode(LED1, OUTPUT);
-//  pinMode(LED2, OUTPUT);
-//  pinMode(LED3, OUTPUT);
-//  pinMode(LED4, OUTPUT);
+  pinMode(LED, OUTPUT);
+  
 //inilitialization
-  digitalWrite(LED1, LOW);
-//  digitalWrite(LED2, LOW);
-//  digitalWrite(LED3, LOW);
-//  digitalWrite(LED4, LOW);
+  digitalWrite(LED, LOW);
 }
 /* Convert degree value to radians */
 double degToRad(double degrees){
@@ -74,25 +66,28 @@ void loop() {
     //delay time for serialport to read data
     delay(3);
     if (buffer == '1'){
-      digitalWrite(LED1, HIGH);
+      digitalWrite(LED, HIGH);
       XBee.println("Foward");
-      esc.write(180); // full fowards
+      esc.write(0); // full fowards
+      delay(1000);
       continue;
     }
     else if (buffer == '2'){
-      digitalWrite(LED1, HIGH);
+      digitalWrite(LED, HIGH);
       XBee.println("Backward");
-      esc.write(0); // full backwards
+      esc.write(90); // full backwards
+      delay(1000);
       continue;
     }
     else if (buffer == '3'){
-      digitalWrite(LED1, HIGH);
+      digitalWrite(LED, HIGH);
       XBee.println("Turn Left");
+      esc.write(0); 
       wheels.write(45); // left
       continue;
     }
     else if (buffer == '4'){
-      digitalWrite(LED1, HIGH);
+      digitalWrite(LED, HIGH);
       XBee.println("Turn Right");
       wheels.write(135); // right
       continue;
