@@ -7,7 +7,7 @@
      * Font-definition & partial css reset. Only Woff, since we lack support for IE8 anyway.
      */
 
-  
+
 
     * {
       box-sizing: border-box;
@@ -372,11 +372,11 @@
       return false;
     });
     $('#start').submit(function(){
-      socket.emit('chat message', "5");
+      socket.emit('chat message', "1");
       return false;
     });
     $('#stop').submit(function(){
-      socket.emit('chat message', "6");
+      socket.emit('chat message', "2");
       return false;
     });
     $('#b').submit(function(){
