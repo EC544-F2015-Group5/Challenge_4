@@ -53,56 +53,35 @@
 	</style>
 </head>
 <body >
-    <div style=" background:url(bulboff.gif);" ><h3> The status of LED</h3></div>
-    <div class="Total">
-	<h3 align="left" 	style="font-size:28px">Main Switch</h3>
-	<form  id="s1" action="">
-  <button  style="position: absolute; top:35%; left: 60%" align ="top">Turn on</button>
-	
-  </form>
-  <form id="e1" action="">
-  <button  style="position: absolute; top:35%; left: 80%" align ="top">Turn off</button>
+    <div style=" background:url(bulboff.gif);" ><h3> The status of CAR</h3></div>
 
 </form></div>
   <div class="LED1">
-	<h3 align="middle" 	style="font-size:28px">LED1</h3>
+	<h3 align="middle" 	style="font-size:28px">Forward/Backforward</h3>
 	<form id="f1" action="">
-  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 18%; font-size:20px;" align ="top">on</button>
+  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 18%; font-size:10px;" align ="top">forward</button>
 	
   </form>
   <form id="n1" action="">
-  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 60%; font-size:20px;" align ="top">off</button>
+  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 38%; font-size:10px;" align ="top">backforward</button>
 
-</form></div>
+</form>
+  <form id="f2" action="">
+  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 58%; font-size:10px;" align ="top">stop</button>
+  </form></div>
+
 
 <div class="LED2">
-	<h3 align="middle" 	style="font-size:28px">LED2</h3>
-  <form id="f2" action="">
-  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 18%; font-size:20px;" align ="top">on</button>
-  </form>
-  <form id="n2" action="">
-	<button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 60%; font-size:20px;" align ="top">off</button>
-	</form>
-</div>
-
-<div class="LED3">
-	<h3 align="middle" 	style="font-size:28px">LED3</h3>
+	<h3 align="middle" 	style="font-size:28px">Speed</h3>
 	<form id="f3" action="">
-  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 18%; font-size:20px;" align ="top">on</button>	
+  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 18%; font-size:10px;" align ="top">Low Speed</button>	
   </form>
   <form id="n3" action="">
-  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 60%; font-size:20px;" align ="top">off</button>
+  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 38%; font-size:10px;" align ="top">Middle Speed</button>
   </form>
-</div>
-
-<div class="LED4">
-	<h3 align="middle" 	style="font-size:28px">LED4</h3>
-	<form id="f4" action="">
-  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 18%; font-size:20px;" align ="top">on</button>
-	</form>
-  <form id="n4" action="">
-  <button style=" height: 40px; width: 70px; position: absolute;top:55%; left: 60%; font-size:20px;" align ="top">off</button>
-</form>
+  	<form id="f4" action="">
+  <button  style="height: 40px; width: 70px; position: absolute; top:55%; left: 58%; font-size:10px;" align ="top">High Speed</button>
+  </form>
 </div>
 
 
@@ -119,29 +98,21 @@
     return false;
   });
     $('#f3').submit(function(){
-    socket.emit('chat message', "3");
+    socket.emit('chat message', "6");
     return false;
   });
     $('#f4').submit(function(){
-    socket.emit('chat message', "4");
+    socket.emit('chat message', "8");
     return false;
   });
     $('#n1').submit(function(){
     socket.emit('chat message', "5");
     return false;
   });
-    $('#n2').submit(function(){
-    socket.emit('chat message', "6");
-    return false;
-  });
     $('#n3').submit(function(){
     socket.emit('chat message', "7");
     return false;
-  });
-    $('#n4').submit(function(){
-    socket.emit('chat message', "8");
-    return false;
-  });   
+  });  
    $('#s1').submit(function(){
     socket.emit('chat message', "o");
     return false;
