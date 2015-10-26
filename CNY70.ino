@@ -24,7 +24,7 @@ void setup()
 {
   Serial.begin(9600);
   
- pinMode(A1, INPUT); 
+ pinMode(A1, INPUT);
   
   Timer1.initialize(1000000); // set timer for 1sec
   attachInterrupt(0, docount, CHANGE);  // increase counter when speed sensor pin goes High
