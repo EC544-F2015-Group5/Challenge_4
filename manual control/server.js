@@ -14,7 +14,7 @@ var sp;
 sp = new SerialPort.SerialPort(portName, portConfig);
 
 app.get('/', function(req, res){
-  res.sendfile('LED_Blink.html');
+  res.sendfile('ControlPad.html');
 });
 
 io.on('connection', function(socket){
@@ -38,4 +38,3 @@ sp.on("open", function () {
     io.emit("chat message",  data);
   });
 });
-
