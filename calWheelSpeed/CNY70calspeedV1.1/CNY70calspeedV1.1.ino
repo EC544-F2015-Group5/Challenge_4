@@ -32,7 +32,7 @@ void loop() {
   {
     rotation = counter/3.00;
     Serial.print("the wheel speed: ");
-    Serial.print(rotation*15*2*3.14);
+    Serial.print(rotation*18*3.14);
     Serial.println("cm/sec");
     timer = 0;
     counter = 0;
