@@ -1,4 +1,3 @@
-#include <SoftwareSerial.h>
 #include <Wire.h>
 #include <PID_v1.h>
 #include <Servo.h>
@@ -11,7 +10,7 @@
 
 //PID Mode
 double input,output,setpoint;
-PID pid0(&input,&output,&setpoint,3.0,0.05,0.0000839,DIRECT);
+PID pid0(&input,&output,&setpoint,3,0,0.9,DIRECT);
 
 Servo wheels; // servo for turning the wheels
 Servo esc; // not actually a servo, but controlled like one!
@@ -31,7 +30,7 @@ int black = 0;
 double counter = 0;
 int timer = 0;
 double rotation = 0;
-
+int count;
 
 /* Start the ultra sonic sensor*/
 void start_sensor(){
@@ -54,11 +53,16 @@ void calSpeed(){
   if(black == 1)
   {
     counter++;
+    //Serial.print("counter:");
+    //Serial.println(counter);
   }
+  //Serial.println(black);
   if(timer == 20)    //print the speed of wheel every sec(20*50=1000ms)
   {
     rotation = counter/2.00;
     Serial.print("the wheel speed: ");
+    Serial.print(rotation);
+    Serial.println("rot/sec");
     Serial.print(rotation*18*3.14);
     Serial.println("cm/sec");
     timer = 0;
@@ -69,9 +73,9 @@ void calSpeed(){
 
 void setup()
 {
+  
   Serial.begin(9600);
 
-  // Servo control
   wheels.attach(8); // initialize wheel servo to Digital IO Pin #8
   esc.attach(9); // initialize ESC to Digital IO Pin #9
   calibrateESC();
@@ -85,10 +89,11 @@ void setup()
     Serial.print(sensorPins[i]);
   }
   //PID Control
-  pid0.SetOutputLimits(0,45 );
+  pid0.SetOutputLimits(-50, 50);
   pid0.SetMode(AUTOMATIC);
-  setpoint=45;
+  setpoint=50;
   pinMode(triggerPin1, OUTPUT);
+  esc.write(75);
 }
 
 /* Calibration */
@@ -105,48 +110,33 @@ void calibrateESC(){
 
 void loop()
 {  
-  start_sensor();
-  distance1 = analogRead(anPin1)/2;
-  delay(50);
-  if(distance1 < 10){esc.write(90);}
-  if(distance1 > 10){
-  enableDisableSensor(3); //Turn on sensor attached to pin 3 and disable all others
-  double dis3 = readDistance()/2.54;
-  enableDisableSensor(2);
-  double dis2 = readDistance()/2.54;
-  input = radToDeg(atan(abs(dis2 - dis3)/6.5));
-    setpoint = 45;
+  enableDisableSensor(2); //Turn on sensor attached to pin 2 and disable all others
+  input=readDistance();
+  if (input > 100) {
+    setpoint = input;
+  }
+  else {
+    setpoint = 50;
+  }
     Serial.print(input);
     Serial.print("       ");
     pid0.Compute();
     Serial.println(output);
-    //if (dis2 < 70  && dis3 < 70){
-    if ((dis2 > dis3) && (wheels.read()+ 10 <90))
-    { wheels.write(wheels.read()+10);}
-    else if(dis2>dis3)
-     { wheels.write(abs(wheels.read()-output));
-    delay(10);   
-   
-    }
-    if ((dis3 > dis2) && (wheels.read()-10 >90))
-    {
-      wheels.write(wheels.read()-10);}
-      else if (dis3>dis2){
-      wheels.write(abs(wheels.read()+output));
-   
-      }
-    
-    //else wheels.write(output);
-    esc.write(75);
+    wheels.write(90 + output);
+    delay(10);
     calSpeed();
-  delay(10);
-  }
-
-}
-
- /* Convert degree value to radians */
-double degToRad(double degrees){
-  return (degrees * 71) / 4068;
+    start_sensor();
+    distance1 = analogRead(anPin1)/2;
+    delay(50);
+    if(distance1<20){
+      count++;
+    }else{
+      count=0;
+    }
+    if(count==3){
+      count=0;
+      esc.write(90);
+    }
 }
 
 /* Convert radian value to degrees */
@@ -154,8 +144,6 @@ double radToDeg(double radians){
   return (radians * 4068) / 71;
 }
 
-
-/* Enable or disable the Lidar Sensor*/
 void enableDisableSensor(int sensorPin){
   for (int i = 0; i < sensorPinsArraySize; i++){
       digitalWrite(sensorPins[i], LOW); // Turn off all sensors
@@ -164,7 +152,6 @@ void enableDisableSensor(int sensorPin){
   delay(1); // The sensor takes 1msec to wake
 }
 
-/* Read Distance for Lidar Sensor*/
 int readDistance(){
   uint8_t nackack = 100; // Setup variable to hold ACK/NACK resopnses     
   while (nackack != 0){ // While NACK keep going (i.e. continue polling until sucess message (ACK) is received )
